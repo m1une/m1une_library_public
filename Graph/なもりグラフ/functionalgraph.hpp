@@ -42,7 +42,7 @@ struct Namori {
             while (!que.empty()) {
                 loop.push_back(que.front());
                 depth[que.front()] = 0;
-                root[que.front()] = loop.size() - 1;
+                root[que.front()] = loops.size();
                 que.pop();
             }
             loops.push_back(loop);
