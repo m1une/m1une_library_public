@@ -4,6 +4,12 @@
 #include <atcoder/segtree>
 using namespace std;
 
+#include <bits/stdc++.h>
+
+#include <atcoder/lazysegtree>
+#include <atcoder/segtree>
+using namespace std;
+
 struct HeavyLightDecomposition {
     int n;
     vector<vector<int>> G;
@@ -17,7 +23,7 @@ struct HeavyLightDecomposition {
             if (u == p) continue;
             dfs_sz(u, v);
             sz[v] += sz[u];
-            if (sz[u] > sz[G[v][0]]) swap(u, G[v][0]);
+            if (G[v][0] == p || sz[u] > sz[G[v][0]]) swap(u, G[v][0]);
         }
     }
     void dfs_hld(int v, int p, int &t) {
@@ -89,6 +95,36 @@ struct HeavyLightDecomposition {
             ord[in[i]] = i;
         }
         return ord;
+    }
+
+    struct iter {
+        int l, r;
+        bool rev, last;
+        iter(int _l, int _r, bool _rev, bool _last)
+            : l(_l), r(_r), rev(_rev), last(_last) {}
+    };
+
+    vector<iter> path(int u, int v) {
+        int lca = this->lca(u, v);
+        vector<iter> res;
+        while (head[u] != head[lca]) {
+            res.emplace_back(in[head[u]], in[u] + 1, true, false);
+            u = par[head[u]];
+        }
+        vector<iter> stk;
+        while (head[v] != head[lca]) {
+            stk.emplace_back(in[head[v]], in[v] + 1, false, false);
+            v = par[head[v]];
+        }
+        if (in[u] < in[v]) {
+            stk.emplace_back(in[u], in[v] + 1, false, true);
+        } else {
+            stk.emplace_back(in[v], in[u] + 1, true, true);
+        }
+        for (auto it = stk.rbegin(); it != stk.rend(); it++) {
+            res.push_back(*it);
+        }
+        return res;
     }
 
     // ord順のsegtreeとordと逆順のsegtreeを渡す(非可換モノイドにも対応)
